@@ -1,0 +1,24 @@
+version: '3.2'
+services:
+  app:
+    image: node:18.16.0
+    container_name: lets-help-rs-backend
+    user: 'root'
+    restart: always
+    working_dir: /app
+    network_mode: 'host'
+    volumes:
+      - ./:/app
+
+    depends_on:
+      - db
+    command: bash -c "npm i --legacy-peer-deps; npm i -g @nestjs/cli; npm run start:dev"
+  db:
+    container_name: lets-help-rs-database
+    image: postgres
+    restart: always
+    network_mode: 'host'
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: letshelprs
