@@ -30,7 +30,7 @@ export class CollectPointService {
       );
     }
 
-    return await this.collectPointRepository.create(collectPointExists);
+    return await this.collectPointRepository.create(createCollectPointDto);
   }
 
   async findAll(

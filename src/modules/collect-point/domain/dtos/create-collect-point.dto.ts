@@ -52,7 +52,10 @@ export class CreateCollectPointDto {
     description: 'Quantidade de reviews do ponto de coleta',
     example: 1,
   })
-  @IsString({ message: 'Reviews em formato inválido' })
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: 'Review em formato inválido' },
+  )
   @IsNotEmpty()
   reviews: number;
 }
