@@ -60,7 +60,7 @@ export class CollectPointController {
     description: 'Ponto de coleta encontrado com sucesso',
   })
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<CollectPointEntity> {
+  findOne(@Param('id') id: string): Promise<CollectPointEntity> {
     return this.collectPointService.findOne(id);
   }
 }
