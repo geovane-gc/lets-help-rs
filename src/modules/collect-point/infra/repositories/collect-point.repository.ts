@@ -35,8 +35,8 @@ export class CollectPointRepository {
     const [total, prismaCollectPoints] = await this.prismaService.$transaction([
       this.prismaService.collectPoint.count({
         where: {
-          // state: params.state,
-          // city: params.city,
+          state: params.state,
+          city: params.city,
           deletedAt: null,
         },
       }),
@@ -44,8 +44,8 @@ export class CollectPointRepository {
         skip: skip,
         take: take,
         where: {
-          // state: params.state,
-          // city: params.city,
+          state: params.state,
+          city: params.city,
           deletedAt: null,
         },
         orderBy: {

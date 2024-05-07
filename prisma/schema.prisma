@@ -8,13 +8,16 @@ datasource db {
 }
 
 model CollectPoint {
-  id        String    @id @default(cuid())
-  latitude  Float
-  longitude Float
-  reviews   Int       @default(0)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  id          String    @id @default(cuid())
+  state       String
+  city        String
+  description String
+  latitude    Float
+  longitude   Float
+  reviews     Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   @@map("collect_points")
 }

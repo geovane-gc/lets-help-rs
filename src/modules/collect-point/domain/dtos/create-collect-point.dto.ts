@@ -3,6 +3,30 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCollectPointDto {
   @ApiProperty({
+    description: 'Informações do estado (localização) do ponto de coleta',
+    example: 'SC',
+  })
+  @IsString({ message: 'Estado em formato inválido' })
+  @IsNotEmpty()
+  state: string;
+
+  @ApiProperty({
+    description: 'Informações da cidade (localização) do ponto de coleta',
+    example: 'Tubarão',
+  })
+  @IsString({ message: 'Cidade em formato inválido' })
+  @IsNotEmpty()
+  city: string;
+
+  @ApiProperty({
+    description: 'Descrição do ponto de coleta',
+    example: 'Farol Shopping',
+  })
+  @IsString({ message: 'Descrição em formato inválido' })
+  @IsNotEmpty()
+  description: string;
+
+  @ApiProperty({
     description: 'Informações da latitude do ponto de coleta',
     example: -28.47648,
   })

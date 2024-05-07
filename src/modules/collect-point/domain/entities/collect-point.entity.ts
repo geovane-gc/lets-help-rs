@@ -2,6 +2,9 @@ import { CollectPoint } from '@prisma/client';
 
 export default class CollectPointEntity {
   readonly id: string;
+  readonly state: string;
+  readonly city: string;
+  readonly description: string;
   readonly latitude: number;
   readonly longitude: number;
   readonly reviews: number;
@@ -11,6 +14,9 @@ export default class CollectPointEntity {
 
   constructor({
     id,
+    state,
+    city,
+    description,
     latitude,
     longitude,
     reviews,
@@ -19,6 +25,9 @@ export default class CollectPointEntity {
     deletedAt,
   }: CollectPointEntity) {
     this.id = id;
+    this.state = state;
+    this.city = city;
+    this.description = description;
     this.latitude = latitude;
     this.longitude = longitude;
     this.reviews = reviews;
