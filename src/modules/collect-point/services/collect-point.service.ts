@@ -9,6 +9,8 @@ import CollectPointEntity from '../domain/entities/collect-point.entity';
 
 import { CollectPointRepository } from '../infra/repositories/collect-point.repository';
 
+import { LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES } from 'src/shared/domain/constants/localization.constants';
+
 @Injectable()
 export class CollectPointService {
   constructor(
@@ -18,15 +20,42 @@ export class CollectPointService {
   async create(
     createCollectPointDto: CreateCollectPointDto,
   ): Promise<CollectPointEntity> {
-    const collectPointExists = await this.collectPointRepository.findOneBy({
-      latitude: createCollectPointDto.latitude,
-      longitude: createCollectPointDto.longitude,
-      deletedAt: null,
+    /**
+     *  Both of these values include a radius that will be implied while searching for collect points
+     *  in order to get better results based on the not-so-precise behavior of localization services
+     *  on mobile devices.
+     */
+    const [
+      latitudeLowerBound,
+      latitudeUpperBound,
+      longitudeLowerBound,
+      longitudeUpperBound,
+    ] = this.generateCoordinatesRadius(
+      createCollectPointDto.latitude,
+      createCollectPointDto.longitude,
+    );
+
+    const collectPointExists = await this.collectPointRepository.findAll({
+      where: {
+        deletedAt: null,
+        ...(createCollectPointDto.latitude && {
+          latitude: {
+            gte: latitudeLowerBound,
+            lte: latitudeUpperBound,
+          },
+        }),
+        ...(createCollectPointDto.longitude && {
+          longitude: {
+            gte: longitudeLowerBound,
+            lte: longitudeUpperBound,
+          },
+        }),
+      },
     });
 
-    if (collectPointExists?.id) {
+    if (collectPointExists.total) {
       throw new BadRequestException(
-        'Ponto de coleta já é cadastrado na plataforma!',
+        'Já existe um ponto de coleta cadastrado nesse raio/perímetro!',
       );
     }
 
@@ -36,7 +65,12 @@ export class CollectPointService {
   async findAll(
     params: ListCollectPointParamsDto,
   ): Promise<FindAllResponseDto<Array<CollectPointEntity>>> {
-    return await this.collectPointRepository.findAll(params);
+    return await this.collectPointRepository.findAll({
+      where: {
+        deletedAt: null,
+        ...params,
+      },
+    });
   }
 
   async findOne(id: string): Promise<CollectPointEntity> {
@@ -57,5 +91,19 @@ export class CollectPointService {
       throw new BadRequestException('Esse ponto de coleta não existe!');
 
     return await this.collectPointRepository.remove(id);
+  }
+
+  private generateCoordinatesRadius(
+    latitude: number,
+    longitude: number,
+  ): Array<number> {
+    const variance = LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES / 2;
+
+    return [
+      latitude - variance,
+      latitude + variance,
+      longitude - variance,
+      longitude + variance,
+    ];
   }
 }

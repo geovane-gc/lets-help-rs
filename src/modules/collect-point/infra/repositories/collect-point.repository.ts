@@ -4,9 +4,8 @@ import { PrismaService } from 'src/database/prisma/prisma.service';
 
 import { FindAllResponseDto } from 'src/shared/domain/dtos/find-all-response.dto';
 
-import { LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES } from 'src/shared/domain/constants/localization.constants';
 import { CreateCollectPointDto } from '../../domain/dtos/create-collect-point.dto';
-import { ListCollectPointParamsDto } from '../../domain/dtos/list-collect-point.dto';
+import { ListCollectPointParams } from '../../domain/dtos/list-collect-point.dto';
 import CollectPointEntity from '../../domain/entities/collect-point.entity';
 
 @Injectable()
@@ -26,59 +25,16 @@ export class CollectPointRepository {
   }
 
   async findAll(
-    params: ListCollectPointParamsDto,
+    params: ListCollectPointParams,
   ): Promise<FindAllResponseDto<Array<CollectPointEntity>>> {
-    const skip = params.skip ? +params.skip : undefined;
-    const take = params.take ? +params.take : undefined;
-    const orderBy = params.orderBy ?? 'id';
-    const ordering = params.ordering ?? 'desc';
-
-    /**
-     *  Both of these values include a radius that will be implied while searching for collect points
-     *  in order to get better results based on the not-so-precise behavior of localization services
-     *  on mobile devices.
-     */
-    const [
-      latitudeLowerBound,
-      latitudeUpperBound,
-      longitudeLowerBound,
-      longitudeUpperBound,
-    ] = this.generateCoordinatesRadius(params.latitude, params.longitude);
+    const { where } = params;
 
     const [total, prismaCollectPoints] = await this.prismaService.$transaction([
       this.prismaService.collectPoint.count({
-        where: {
-          state: params.state,
-          city: params.city,
-
-          ...(params.latitude && {
-            latitude: {
-              gte: latitudeLowerBound,
-              lte: latitudeUpperBound,
-            },
-          }),
-
-          ...(params.longitude && {
-            longitude: {
-              gte: longitudeLowerBound,
-              lte: longitudeUpperBound,
-            },
-          }),
-
-          deletedAt: null,
-        },
+        where,
       }),
       this.prismaService.collectPoint.findMany({
-        skip: skip,
-        take: take,
-        where: {
-          state: params.state,
-          city: params.city,
-          deletedAt: null,
-        },
-        orderBy: {
-          [orderBy]: ordering,
-        },
+        where,
       }),
     ]);
 
@@ -86,11 +42,9 @@ export class CollectPointRepository {
       CollectPointEntity.fromPrisma(collectPoint),
     );
 
-    // TODO - Maybe this is not going to be paginated
     return {
       data: collectPoints,
       total: total,
-      pages: take ? Math.round(total / take) : 0,
     };
   }
 
@@ -102,6 +56,16 @@ export class CollectPointRepository {
     });
 
     return CollectPointEntity.fromPrisma(collectPoint);
+  }
+
+  async findBy(where: Partial<CollectPoint>): Promise<CollectPointEntity[]> {
+    const collectPoints = await this.prismaService.collectPoint.findMany({
+      where,
+    });
+
+    return collectPoints.map((collectPoint) =>
+      CollectPointEntity.fromPrisma(collectPoint),
+    );
   }
 
   async findOneBy(where: Partial<CollectPoint>): Promise<CollectPointEntity> {
@@ -128,19 +92,5 @@ export class CollectPointRepository {
     });
 
     return CollectPointEntity.fromPrisma(collectPoint[0]);
-  }
-
-  private generateCoordinatesRadius(
-    latitude: number,
-    longitude: number,
-  ): Array<number> {
-    const variance = LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES / 2;
-
-    return [
-      latitude - variance,
-      latitude + variance,
-      longitude - variance,
-      longitude + variance,
-    ];
   }
 }
