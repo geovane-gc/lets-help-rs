@@ -1,4 +1,4 @@
-name: Mathesis - API
+name: Build and Test - API
 on:
   push:
     branches: [main]
