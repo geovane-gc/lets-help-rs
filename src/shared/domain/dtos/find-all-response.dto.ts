@@ -10,9 +10,4 @@ export class FindAllResponseDto<T> {
   @IsOptional()
   @IsNumber()
   public total: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  public pages: number;
 }
