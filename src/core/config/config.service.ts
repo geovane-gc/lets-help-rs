@@ -1,5 +1,6 @@
 import { INestApplication, Injectable, Logger } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import { ThrottlerOptions } from '@nestjs/throttler';
 import { Environment } from './config.constants';
 
 @Injectable()
@@ -29,6 +30,10 @@ export class ConfigService {
     }
   }
 
+  readEnvVariable<T = string, K = any>(key: string, or?: K): T | K {
+    return (process.env[key] as T) || or;
+  }
+
   configureSwagger(app: INestApplication): OpenAPIObject {
     const config = new DocumentBuilder()
       .setTitle("Let's help RS!")
@@ -38,5 +43,14 @@ export class ConfigService {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('doc', app, document);
     return document;
+  }
+
+  configureThrottler(): ThrottlerOptions[] {
+    return [
+      {
+        ttl: this.readEnvVariable('THROTTLER_TTL', 60000),
+        limit: this.readEnvVariable('THROTTLER_LIMIT', 10),
+      },
+    ];
   }
 }

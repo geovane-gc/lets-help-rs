@@ -1,4 +1,4 @@
-name: Mathesis - API
+name: Build and Test - API
 on:
   push:
     branches: [main]
@@ -21,3 +21,5 @@ jobs:
         run: npm install
       - name: Run Build
         run: npm run build
+      - name: Run Tests
+        run: npm run test
