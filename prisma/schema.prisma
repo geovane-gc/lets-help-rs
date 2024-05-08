@@ -8,16 +8,48 @@ datasource db {
 }
 
 model CollectPoint {
-  id          String    @id @default(cuid())
-  state       String
+  id          String          @id @default(cuid())
+  state       BrazilianStates
   city        String
   description String
   latitude    Float
   longitude   Float
-  reviews     Int       @default(0)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  reviews     Int             @default(0)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  deletedAt   DateTime?       @map("deleted_at")
 
   @@map("collect_points")
+}
+
+enum BrazilianStates {
+  AC
+  AL
+  AP
+  AM
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MT
+  MS
+  MG
+  PA
+  PB
+  PR
+  PE
+  PI
+  RJ
+  RN
+  RS
+  RO
+  RR
+  SC
+  SP
+  SE
+  TO
+
+  @@map("brazilian_states")
 }
