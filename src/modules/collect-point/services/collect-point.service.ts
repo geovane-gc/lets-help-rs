@@ -20,11 +20,6 @@ export class CollectPointService {
   async create(
     createCollectPointDto: CreateCollectPointDto,
   ): Promise<CollectPointEntity> {
-    /**
-     *  Both of these values include a radius that will be implied while searching for collect points
-     *  in order to get better results based on the not-so-precise behavior of localization services
-     *  on mobile devices.
-     */
     const [
       latitudeLowerBound,
       latitudeUpperBound,
@@ -65,10 +60,28 @@ export class CollectPointService {
   async findAll(
     params: ListCollectPointParamsDto,
   ): Promise<FindAllResponseDto<Array<CollectPointEntity>>> {
+    const [
+      latitudeLowerBound,
+      latitudeUpperBound,
+      longitudeLowerBound,
+      longitudeUpperBound,
+    ] = this.generateCoordinatesRadius(params.latitude, params.longitude);
+
     return await this.collectPointRepository.findAll({
       where: {
         deletedAt: null,
-        ...params,
+        ...(params.latitude && {
+          latitude: {
+            gte: latitudeLowerBound,
+            lte: latitudeUpperBound,
+          },
+        }),
+        ...(params.longitude && {
+          longitude: {
+            gte: longitudeLowerBound,
+            lte: longitudeUpperBound,
+          },
+        }),
       },
     });
   }
