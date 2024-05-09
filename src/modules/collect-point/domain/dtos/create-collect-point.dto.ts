@@ -31,15 +31,4 @@ export class CreateCollectPointDto {
   )
   @IsNotEmpty()
   longitude: number;
-
-  @ApiProperty({
-    description: 'Quantidade de reviews do ponto de coleta',
-    example: 1,
-  })
-  @IsNumber(
-    { allowInfinity: false, allowNaN: false },
-    { message: 'Review em formato inválido' },
-  )
-  @IsNotEmpty()
-  reviews: number;
 }
