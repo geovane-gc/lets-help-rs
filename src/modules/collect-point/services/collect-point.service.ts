@@ -9,7 +9,10 @@ import CollectPointEntity from '../domain/entities/collect-point.entity';
 
 import { CollectPointRepository } from '../infra/repositories/collect-point.repository';
 
-import { LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES } from 'src/shared/domain/constants/localization.constants';
+import {
+  CREATION_ACCURACY_RADIUS_IN_DEGREES,
+  LOCALIZATION_ACCURACY_RADIUS_IN_DEGREES,
+} from 'src/shared/domain/constants/localization.constants';
 
 @Injectable()
 export class CollectPointService {
@@ -25,7 +28,7 @@ export class CollectPointService {
       latitudeUpperBound,
       longitudeLowerBound,
       longitudeUpperBound,
-    ] = this.generateCoordinatesRadius(
+    ] = this.generateCreationCoordinatesRadius(
       createCollectPointDto.latitude,
       createCollectPointDto.longitude,
     );
@@ -65,7 +68,10 @@ export class CollectPointService {
       latitudeUpperBound,
       longitudeLowerBound,
       longitudeUpperBound,
-    ] = this.generateCoordinatesRadius(params.latitude, params.longitude);
+    ] = this.generateLocalizationCoordinatesRadius(
+      params.latitude,
+      params.longitude,
+    );
 
     return await this.collectPointRepository.findAll({
       where: {
@@ -106,7 +112,21 @@ export class CollectPointService {
     return await this.collectPointRepository.remove(id);
   }
 
-  private generateCoordinatesRadius(
+  private generateCreationCoordinatesRadius(
+    latitude: number,
+    longitude: number,
+  ): Array<number> {
+    const variance = CREATION_ACCURACY_RADIUS_IN_DEGREES / 2;
+
+    return [
+      latitude - variance,
+      latitude + variance,
+      longitude - variance,
+      longitude + variance,
+    ];
+  }
+
+  private generateLocalizationCoordinatesRadius(
     latitude: number,
     longitude: number,
   ): Array<number> {
