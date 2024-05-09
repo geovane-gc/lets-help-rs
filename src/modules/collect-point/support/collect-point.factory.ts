@@ -6,8 +6,6 @@ export const generateMockCollectPoint = (
 ): CollectPointEntity => {
   return {
     id: faker.string.uuid(),
-    city: faker.location.city(),
-    state: faker.location.state(),
     latitude: faker.number.float(),
     longitude: faker.number.float(),
     description: faker.lorem.sentence(),
