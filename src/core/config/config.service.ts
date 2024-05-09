@@ -49,7 +49,10 @@ export class ConfigService {
     return [
       {
         ttl: this.readEnvVariable('THROTTLER_TTL', 60000),
-        limit: this.readEnvVariable('THROTTLER_LIMIT', 10),
+        limit: this.readEnvVariable(
+          'THROTTLER_LIMIT',
+          this.environment === 'production' ? 10 : 1000,
+        ),
       },
     ];
   }
