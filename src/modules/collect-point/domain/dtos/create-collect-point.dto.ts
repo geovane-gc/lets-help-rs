@@ -1,26 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BrazilianStates } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCollectPointDto {
-  @ApiProperty({
-    description: 'Informações do estado (localização) do ponto de coleta',
-    example: 'SC',
-  })
-  @IsEnum(BrazilianStates, {
-    message: 'Estado em formato inválido',
-  })
-  @IsNotEmpty()
-  state: BrazilianStates;
-
-  @ApiProperty({
-    description: 'Informações da cidade (localização) do ponto de coleta',
-    example: 'Tubarão',
-  })
-  @IsString({ message: 'Cidade em formato inválido' })
-  @IsNotEmpty()
-  city: string;
-
   @ApiProperty({
     description: 'Descrição do ponto de coleta',
     example: 'Farol Shopping',
